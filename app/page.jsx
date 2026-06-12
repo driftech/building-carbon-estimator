@@ -40,8 +40,8 @@ const text = {
   contactTitle: "\u8054\u7cfb\u4fe1\u606f",
   wechat: "\u5fae\u4fe1",
   email: "\u90ae\u7bb1",
-  wechatPlaceholder: "\u8bf7\u586b\u5199\u4f60\u7684\u5fae\u4fe1",
-  emailPlaceholder: "\u8bf7\u586b\u5199\u4f60\u7684\u90ae\u7bb1",
+  wechatPlaceholder: "driftech",
+  emailPlaceholder: "conglau@126.com\u3001cconglau@gmail.com",
   disclaimerTitle: "\u514d\u8d23\u58f0\u660e",
   disclaimer:
     "\u672c\u5de5\u5177\u4ec5\u7528\u4e8e\u65b9\u6848\u9636\u6bb5\u5feb\u901f\u4f30\u7b97\u548c\u6559\u5b66\u79d1\u7814\u8f85\u52a9\uff0c\u4e0d\u4f5c\u4e3a\u6b63\u5f0f\u78b3\u6838\u7b97\u3001\u78b3\u5ba1\u8ba1\u6216\u6cd5\u5b9a\u8bc4\u4ef7\u4f9d\u636e\u3002",
@@ -738,43 +738,6 @@ export default function Home() {
           </div>
         </header>
 
-        <section className="grid gap-6 py-8 lg:grid-cols-[1.05fr_0.95fr]">
-          <div>
-            <h2 className="text-xl font-semibold text-slate-950">
-              {text.scenariosTitle}
-            </h2>
-            <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              {scenarios.map((scenario) => (
-                <div
-                  className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700 shadow-sm"
-                  key={scenario}
-                >
-                  {scenario}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-            <h2 className="text-xl font-semibold text-slate-950">
-              {text.serviceTitle}
-            </h2>
-            <p className="mt-3 text-sm leading-7 text-slate-600">
-              {text.serviceDescription}
-            </p>
-            <div className="mt-4 grid gap-2 text-sm text-slate-600">
-              <p>
-                <span className="font-medium text-slate-800">{text.wechat}：</span>
-                {text.wechatPlaceholder}
-              </p>
-              <p>
-                <span className="font-medium text-slate-800">{text.email}：</span>
-                {text.emailPlaceholder}
-              </p>
-            </div>
-          </div>
-        </section>
-
         <section className="grid gap-8 py-8 lg:grid-cols-[minmax(0,1.08fr)_minmax(380px,0.92fr)]">
           <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
             <div className="mb-6 flex items-end justify-between gap-4 border-b border-slate-100 pb-4">
@@ -1160,6 +1123,43 @@ export default function Home() {
               </div>
             ) : null}
           </aside>
+        </section>
+
+        <section className="grid gap-6 border-t border-slate-200 py-8 lg:grid-cols-[1.05fr_0.95fr]">
+          <div>
+            <h2 className="text-xl font-semibold text-slate-950">
+              {text.scenariosTitle}
+            </h2>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              {scenarios.map((scenario) => (
+                <div
+                  className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700 shadow-sm"
+                  key={scenario}
+                >
+                  {scenario}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+            <h2 className="text-xl font-semibold text-slate-950">
+              {text.serviceTitle}
+            </h2>
+            <p className="mt-3 text-sm leading-7 text-slate-600">
+              {text.serviceDescription}
+            </p>
+            <div className="mt-4 grid gap-2 text-sm text-slate-600">
+              <p>
+                <span className="font-medium text-slate-800">{text.wechat}：</span>
+                {text.wechatPlaceholder}
+              </p>
+              <p>
+                <span className="font-medium text-slate-800">{text.email}：</span>
+                {text.emailPlaceholder}
+              </p>
+            </div>
+          </div>
         </section>
 
         <footer className="grid gap-4 border-t border-slate-200 pt-5 text-sm leading-6 text-slate-500">
