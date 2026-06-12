@@ -20,12 +20,13 @@ import {
   factorsToInputValues,
   findRegionEmissionFactorSet,
 } from "../lib/regionEmissionFactors";
+import { provinceCityOptions } from "../lib/chinaRegions";
 
 const text = {
   eyebrow: "\u5efa\u7b51\u5168\u751f\u547d\u5468\u671f\u78b3\u6392\u653e\u6d4b\u7b97\u5de5\u5177",
   title: "\u5efa\u7b51\u78b3\u6392\u653e\u5feb\u901f\u4f30\u7b97\u5668",
   subtitle:
-    "\u7528\u4e8e\u5efa\u7b51\u65b9\u6848\u9636\u6bb5\u7684\u78b3\u6392\u653e\u521d\u6b65\u6d4b\u7b97\u4e0e\u7ed3\u679c\u53ef\u89c6\u5316",
+    "\u7528\u4e8e\u5efa\u7b51\u65b9\u6848\u9636\u6bb5\u7684\u78b3\u6392\u653e\u521d\u6b65\u6d4b\u7b97\u3001\u7ed3\u679c\u53ef\u89c6\u5316\u4e0e\u62a5\u544a\u751f\u6210",
   inputTitle: "\u8f93\u5165\u533a",
   inputIntro:
     "\u586b\u5199\u5efa\u7b51\u65b9\u6848\u3001\u8fd0\u884c\u80fd\u8017\u3001\u5efa\u6750\u7528\u91cf\u548c\u78b3\u6392\u653e\u56e0\u5b50",
@@ -45,6 +46,12 @@ const text = {
   disclaimer:
     "\u672c\u5de5\u5177\u4ec5\u7528\u4e8e\u65b9\u6848\u9636\u6bb5\u5feb\u901f\u4f30\u7b97\u548c\u6559\u5b66\u79d1\u7814\u8f85\u52a9\uff0c\u4e0d\u4f5c\u4e3a\u6b63\u5f0f\u78b3\u6838\u7b97\u3001\u78b3\u5ba1\u8ba1\u6216\u6cd5\u5b9a\u8bc4\u4ef7\u4f9d\u636e\u3002",
   basicInfo: "\u57fa\u7840\u4fe1\u606f",
+  basicInfoIntro: "\u586b\u5199\u9879\u76ee\u540d\u79f0\u3001\u5efa\u7b51\u7c7b\u578b\u548c\u8ba1\u7b97\u8fb9\u754c\u4fe1\u606f\u3002",
+  regionSelectTitle: "\u6240\u5728\u5730\u533a\u9009\u62e9",
+  regionSelectIntro: "\u53ef\u624b\u52a8\u8f93\u5165\u5730\u533a\uff0c\u4e5f\u53ef\u4f7f\u7528\u7701\u5e02\u6eda\u8f6e\u9009\u62e9\u5e76\u5339\u914d\u793a\u4f8b\u56e0\u5b50\u7ec4\u3002",
+  selectedRegion: "\u5f53\u524d\u9009\u62e9",
+  province: "\u7701\u4efd",
+  city: "\u57ce\u5e02",
   buildingName: "\u5efa\u7b51\u540d\u79f0",
   buildingType: "\u5efa\u7b51\u7c7b\u578b",
   region: "\u6240\u5728\u5730\u533a",
@@ -123,6 +130,13 @@ const text = {
   annualOperationCarbon:
     "\u8fd0\u884c\u9636\u6bb5\u5e74\u78b3\u6392\u653e",
 };
+
+const featureTags = [
+  "\u5730\u533a\u56e0\u5b50\u5339\u914d",
+  "\u7701\u5e02\u6eda\u8f6e\u9009\u62e9",
+  "\u7ed3\u679c\u53ef\u89c6\u5316",
+  "PDF \u62a5\u544a\u5bfc\u51fa",
+];
 
 const scenarios = [
   "\u8bfe\u7a0b\u4f5c\u4e1a",
@@ -294,6 +308,108 @@ function Field({ label, unit, children }) {
   );
 }
 
+function SectionCard({ children, intro, title }) {
+  return (
+    <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+      <div className="mb-5">
+        <h3 className="text-base font-semibold text-slate-950">{title}</h3>
+        {intro ? (
+          <p className="mt-1 text-sm leading-6 text-slate-500">{intro}</p>
+        ) : null}
+      </div>
+      {children}
+    </section>
+  );
+}
+
+function MetricCard({ title, value }) {
+  return (
+    <div className="min-h-32 rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+      <p className="text-sm font-medium text-slate-500">{title}</p>
+      <p className="mt-5 min-h-8 break-words text-2xl font-semibold text-slate-950">
+        {value}
+      </p>
+    </div>
+  );
+}
+
+function WheelColumn({ items, selected, onSelect }) {
+  return (
+    <div className="max-h-44 overflow-y-auto rounded-md border border-slate-200 bg-white p-2">
+      <div className="grid gap-1">
+        {items.map((item) => {
+          const isSelected = item === selected;
+
+          return (
+            <button
+              className={`h-9 rounded px-3 text-left text-sm transition ${
+                isSelected
+                  ? "bg-teal-50 font-semibold text-teal-800 ring-1 ring-teal-200"
+                  : "text-slate-500 hover:bg-slate-50 hover:text-slate-800"
+              }`}
+              key={item}
+              onClick={() => onSelect(item)}
+              type="button"
+            >
+              {item}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function RegionWheelPicker({
+  currentFactorSet,
+  currentRegion,
+  onCitySelect,
+  onProvinceSelect,
+  selectedCity,
+  selectedProvince,
+}) {
+  const selectedOption =
+    provinceCityOptions.find((option) => option.province === selectedProvince) ??
+    provinceCityOptions[0];
+
+  return (
+    <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div>
+          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
+            {text.province}
+          </p>
+          <WheelColumn
+            items={provinceCityOptions.map((option) => option.province)}
+            onSelect={onProvinceSelect}
+            selected={selectedProvince}
+          />
+        </div>
+        <div>
+          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
+            {text.city}
+          </p>
+          <WheelColumn
+            items={selectedOption.cities}
+            onSelect={onCitySelect}
+            selected={selectedCity}
+          />
+        </div>
+      </div>
+      <div className="mt-4 rounded-md border border-teal-100 bg-white p-3 text-sm leading-6 text-slate-600">
+        <p>
+          <span className="font-medium text-slate-800">{text.selectedRegion}：</span>
+          {currentRegion || `${selectedProvince} / ${selectedCity}`}
+        </p>
+        <p>
+          <span className="font-medium text-slate-800">{text.factorGroup}：</span>
+          {currentFactorSet.displayName}
+        </p>
+      </div>
+    </div>
+  );
+}
+
 function ReportSection({ title, rows }) {
   return (
     <section className="mt-6">
@@ -403,6 +519,12 @@ export default function Home() {
   const [currentFactorSet, setCurrentFactorSet] = useState(defaultEmissionFactorSet);
   const [hasManualFactorEdit, setHasManualFactorEdit] = useState(false);
   const [factorMatchMessage, setFactorMatchMessage] = useState("");
+  const [selectedProvince, setSelectedProvince] = useState(
+    provinceCityOptions[0].province,
+  );
+  const [selectedCity, setSelectedCity] = useState(
+    provinceCityOptions[0].cities[0],
+  );
   const [results, setResults] = useState(null);
   const [isExporting, setIsExporting] = useState(false);
   const reportRef = useRef(null);
@@ -420,6 +542,21 @@ export default function Home() {
       [name]: value,
     }));
     setHasManualFactorEdit(true);
+  }
+
+  function handleProvinceSelect(province) {
+    const option =
+      provinceCityOptions.find((item) => item.province === province) ??
+      provinceCityOptions[0];
+
+    setSelectedProvince(option.province);
+    setSelectedCity(option.cities[0]);
+    updateField("region", option.cities[0]);
+  }
+
+  function handleCitySelect(city) {
+    setSelectedCity(city);
+    updateField("region", city);
   }
 
   function resetFactors() {
@@ -568,30 +705,40 @@ export default function Home() {
   ];
 
   const inputClass =
-    "h-11 rounded border border-slate-300 bg-white px-3 text-slate-950 outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100";
+    "h-11 rounded-md border border-slate-200 bg-white px-3 text-slate-950 outline-none transition placeholder:text-slate-300 focus:border-teal-600 focus:ring-4 focus:ring-teal-50";
   const stageColors = ["#047857", "#334155"];
   const materialColor = "#0f766e";
   const analysis = results ? buildAnalysis(results) : "";
 
   return (
-    <main className="min-h-screen px-5 py-8 sm:px-8 lg:px-12">
+    <main className="min-h-screen bg-slate-50 px-5 py-8 sm:px-8 lg:px-12">
       <div className="mx-auto max-w-7xl">
-        <header className="border-b border-slate-200 pb-8">
-          <p className="mb-3 text-sm font-medium tracking-wide text-emerald-700">
+        <header className="rounded-xl border border-slate-200 bg-white px-6 py-8 shadow-sm sm:px-8">
+          <p className="mb-3 text-sm font-semibold tracking-wide text-teal-700">
             {text.eyebrow}
           </p>
-          <h1 className="text-3xl font-semibold text-slate-950 sm:text-4xl">
+          <h1 className="text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">
             {text.title}
           </h1>
-          <p className="mt-4 max-w-3xl text-base leading-7 text-slate-600 sm:text-lg">
+          <p className="mt-4 max-w-4xl text-base leading-7 text-slate-600 sm:text-lg">
             {text.subtitle}
           </p>
           <p className="mt-4 max-w-4xl text-sm leading-7 text-slate-600 sm:text-base">
             {text.toolIntro}
           </p>
+          <div className="mt-5 flex flex-wrap gap-2">
+            {featureTags.map((tag) => (
+              <span
+                className="rounded-full border border-teal-100 bg-teal-50 px-3 py-1 text-sm font-medium text-teal-800"
+                key={tag}
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
         </header>
 
-        <section className="grid gap-6 border-b border-slate-200 py-8 lg:grid-cols-[1fr_1fr]">
+        <section className="grid gap-6 py-8 lg:grid-cols-[1.05fr_0.95fr]">
           <div>
             <h2 className="text-xl font-semibold text-slate-950">
               {text.scenariosTitle}
@@ -599,7 +746,7 @@ export default function Home() {
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               {scenarios.map((scenario) => (
                 <div
-                  className="rounded border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700"
+                  className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700 shadow-sm"
                   key={scenario}
                 >
                   {scenario}
@@ -608,7 +755,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="rounded border border-slate-200 bg-white p-5">
+          <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
             <h2 className="text-xl font-semibold text-slate-950">
               {text.serviceTitle}
             </h2>
@@ -628,8 +775,8 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="grid gap-8 py-8 lg:grid-cols-[minmax(0,1fr)_minmax(360px,0.9fr)]">
-          <div className="rounded border border-slate-200 bg-white p-6 shadow-sm">
+        <section className="grid gap-8 py-8 lg:grid-cols-[minmax(0,1.08fr)_minmax(380px,0.92fr)]">
+          <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
             <div className="mb-6 flex items-end justify-between gap-4 border-b border-slate-100 pb-4">
               <div>
                 <h2 className="text-xl font-semibold text-slate-950">
@@ -640,11 +787,8 @@ export default function Home() {
               <span className="text-sm text-slate-400">{text.stage}</span>
             </div>
 
-            <form className="grid gap-7" onSubmit={handleCalculate}>
-              <div className="grid gap-5">
-                <h3 className="text-base font-semibold text-slate-900">
-                  {text.basicInfo}
-                </h3>
+            <form className="grid gap-5" onSubmit={handleCalculate}>
+              <SectionCard intro={text.basicInfoIntro} title={text.basicInfo}>
                 <Field label={text.buildingName}>
                   <input
                     className={inputClass}
@@ -670,7 +814,18 @@ export default function Home() {
                     ))}
                   </select>
                 </Field>
+              </SectionCard>
 
+              <SectionCard intro={text.regionSelectIntro} title={text.regionSelectTitle}>
+                <RegionWheelPicker
+                  currentFactorSet={currentFactorSet}
+                  currentRegion={form.region}
+                  onCitySelect={handleCitySelect}
+                  onProvinceSelect={handleProvinceSelect}
+                  selectedCity={selectedCity}
+                  selectedProvince={selectedProvince}
+                />
+                <div className="mt-5">
                 <Field label={text.region}>
                   <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto]">
                     <input
@@ -683,7 +838,7 @@ export default function Home() {
                       value={form.region}
                     />
                     <button
-                      className="h-11 rounded border border-emerald-700 bg-white px-4 text-sm font-semibold text-emerald-800 transition hover:bg-emerald-50"
+                      className="h-11 rounded-md border border-teal-600 bg-white px-4 text-sm font-semibold text-teal-700 transition hover:bg-teal-50"
                       onClick={matchRegionFactors}
                       type="button"
                     >
@@ -691,6 +846,7 @@ export default function Home() {
                     </button>
                   </div>
                 </Field>
+                </div>
 
                 <div className="grid gap-5 sm:grid-cols-2">
                   <Field label={text.area} unit="m\u00b2">
@@ -716,12 +872,9 @@ export default function Home() {
                     />
                   </Field>
                 </div>
-              </div>
+              </SectionCard>
 
-              <div className="grid gap-5 border-t border-slate-100 pt-6">
-                <h3 className="text-base font-semibold text-slate-900">
-                  {text.operationInput}
-                </h3>
+              <SectionCard title={text.operationInput}>
                 <div className="grid gap-5 sm:grid-cols-2">
                   <Field label={text.annualElectricity} unit="kWh/\u5e74">
                     <input
@@ -749,12 +902,9 @@ export default function Home() {
                     />
                   </Field>
                 </div>
-              </div>
+              </SectionCard>
 
-              <div className="grid gap-5 border-t border-slate-100 pt-6">
-                <h3 className="text-base font-semibold text-slate-900">
-                  {text.materialInput}
-                </h3>
+              <SectionCard title={text.materialInput}>
                 <div className="grid gap-5 sm:grid-cols-2">
                   <Field label={text.concrete} unit="m\u00b3">
                     <input
@@ -804,16 +954,16 @@ export default function Home() {
                     />
                   </Field>
                 </div>
-              </div>
+              </SectionCard>
 
               <details
-                className="rounded border border-slate-200 bg-slate-50 p-4"
+                className="rounded-lg border border-slate-200 bg-slate-50 p-5"
                 open
               >
-                <summary className="cursor-pointer text-base font-semibold text-slate-900">
+                <summary className="cursor-pointer text-base font-semibold text-slate-950">
                   {text.factorSettings}
                 </summary>
-                <div className="mt-4 rounded border border-slate-200 bg-white p-4 text-sm leading-6 text-slate-600">
+                <div className="mt-4 rounded-lg border border-slate-200 bg-white p-4 text-sm leading-6 text-slate-600">
                   <p>
                     <span className="font-medium text-slate-800">
                       {text.factorGroup}：
@@ -839,7 +989,7 @@ export default function Home() {
                     {hasManualFactorEdit ? text.modified : text.notModified}
                   </p>
                   {factorMatchMessage ? (
-                    <p className="mt-2 font-medium text-emerald-700">
+                    <p className="mt-2 font-medium text-teal-700">
                       {factorMatchMessage}
                     </p>
                   ) : null}
@@ -865,14 +1015,14 @@ export default function Home() {
                   ))}
                 </div>
                 <button
-                  className="mt-5 h-10 rounded border border-slate-300 bg-white px-4 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+                  className="mt-5 h-10 rounded-md border border-slate-300 bg-white px-4 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
                   onClick={resetFactors}
                   type="button"
                 >
                   {text.resetFactors}
                 </button>
                 <button
-                  className="ml-0 mt-3 h-10 rounded border border-slate-300 bg-white px-4 text-sm font-medium text-slate-700 transition hover:bg-slate-100 sm:ml-3"
+                  className="ml-0 mt-3 h-10 rounded-md border border-slate-300 bg-white px-4 text-sm font-medium text-slate-700 transition hover:bg-slate-100 sm:ml-3"
                   onClick={matchRegionFactors}
                   type="button"
                 >
@@ -884,7 +1034,7 @@ export default function Home() {
               </details>
 
               <button
-                className="h-12 rounded bg-emerald-700 px-5 text-base font-semibold text-white transition hover:bg-emerald-800 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+                className="h-12 rounded-md bg-teal-700 px-5 text-base font-semibold text-white shadow-sm transition hover:bg-teal-800 focus:outline-none focus:ring-4 focus:ring-teal-100"
                 type="submit"
               >
                 {text.calculate}
@@ -892,7 +1042,7 @@ export default function Home() {
             </form>
           </div>
 
-          <aside className="rounded border border-slate-200 bg-slate-50 p-6">
+          <aside className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
             <div className="mb-6 border-b border-slate-200 pb-4">
               <h2 className="text-xl font-semibold text-slate-950">
                 {text.resultTitle}
@@ -900,30 +1050,20 @@ export default function Home() {
               <p className="mt-1 text-sm text-slate-500">{text.resultIntro}</p>
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+            <div className="grid gap-4 sm:grid-cols-2">
               {resultCards.map((card) => (
-                <div
-                  className="min-h-36 rounded border border-slate-200 bg-white p-5 shadow-sm"
-                  key={card.title}
-                >
-                  <p className="text-sm font-medium text-slate-600">
-                    {card.title}
-                  </p>
-                  <p className="mt-7 min-h-8 text-2xl font-semibold text-slate-950">
-                    {card.value}
-                  </p>
-                </div>
+                <MetricCard key={card.title} title={card.title} value={card.value} />
               ))}
             </div>
 
-            <div className="mt-6 rounded border border-slate-200 bg-white p-4 text-sm leading-6 text-slate-500">
+            <div className="mt-6 rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm leading-6 text-slate-500">
               {text.factorNote}
             </div>
 
             {results ? (
               <>
                 <button
-                  className="mt-6 h-11 w-full rounded bg-slate-900 px-5 text-sm font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:bg-slate-400"
+                  className="mt-6 h-11 w-full rounded-md border border-slate-900 bg-white px-5 text-sm font-semibold text-slate-900 transition hover:bg-slate-900 hover:text-white disabled:cursor-not-allowed disabled:border-slate-300 disabled:bg-slate-100 disabled:text-slate-400"
                   disabled={isExporting}
                   onClick={handleExportPdf}
                   type="button"
@@ -931,7 +1071,7 @@ export default function Home() {
                   {isExporting ? text.exportingPdf : text.exportPdf}
                 </button>
 
-                <section className="mt-6 rounded border border-slate-200 bg-white p-5">
+                <section className="mt-6 rounded-lg border border-teal-100 bg-teal-50/60 p-5">
                   <h3 className="text-base font-semibold text-slate-950">
                     {text.analysisTitle}
                   </h3>
@@ -944,7 +1084,7 @@ export default function Home() {
 
             {results ? (
               <div className="mt-6 grid gap-6">
-                <section className="rounded border border-slate-200 bg-white p-5">
+                <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
                   <h3 className="text-base font-semibold text-slate-950">
                     {text.stageChartTitle}
                   </h3>
@@ -981,7 +1121,7 @@ export default function Home() {
                   </div>
                 </section>
 
-                <section className="rounded border border-slate-200 bg-white p-5">
+                <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
                   <h3 className="text-base font-semibold text-slate-950">
                     {text.materialChartTitle}
                   </h3>
