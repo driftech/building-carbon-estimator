@@ -23,7 +23,21 @@ const text = {
   inputTitle: "\u8f93\u5165\u533a",
   inputIntro:
     "\u586b\u5199\u5efa\u7b51\u65b9\u6848\u3001\u8fd0\u884c\u80fd\u8017\u3001\u5efa\u6750\u7528\u91cf\u548c\u78b3\u6392\u653e\u56e0\u5b50",
-  stage: "\u7b2c\u516d\u9636\u6bb5",
+  stage: "\u7b2c\u516b\u9636\u6bb5",
+  toolIntro:
+    "\u5efa\u7b51\u78b3\u6392\u653e\u5feb\u901f\u4f30\u7b97\u5668\u662f\u4e00\u6b3e\u9762\u5411\u5efa\u7b51\u65b9\u6848\u9636\u6bb5\u3001\u8bfe\u7a0b\u4f5c\u4e1a\u3001\u8bfe\u9898\u6c47\u62a5\u548c\u4f4e\u78b3\u8bbe\u8ba1\u521d\u6b65\u5206\u6790\u7684\u5728\u7ebf\u8ba1\u7b97\u5de5\u5177\u3002",
+  scenariosTitle: "\u9002\u7528\u573a\u666f",
+  serviceTitle: "\u670d\u52a1\u8bf4\u660e",
+  serviceDescription:
+    "\u5982\u9700\u5b9a\u5236\u5efa\u7b51\u78b3\u6392\u653e\u8ba1\u7b97\u62a5\u544a\u3001\u4f4e\u78b3\u5efa\u7b51\u8bc4\u4ef7\u5de5\u5177\u6216\u8bfe\u9898\u7ec4\u5c55\u793a\u7cfb\u7edf\uff0c\u53ef\u8054\u7cfb\u5f00\u53d1\u8005\u3002",
+  contactTitle: "\u8054\u7cfb\u4fe1\u606f",
+  wechat: "\u5fae\u4fe1",
+  email: "\u90ae\u7bb1",
+  wechatPlaceholder: "\u8bf7\u586b\u5199\u4f60\u7684\u5fae\u4fe1",
+  emailPlaceholder: "\u8bf7\u586b\u5199\u4f60\u7684\u90ae\u7bb1",
+  disclaimerTitle: "\u514d\u8d23\u58f0\u660e",
+  disclaimer:
+    "\u672c\u5de5\u5177\u4ec5\u7528\u4e8e\u65b9\u6848\u9636\u6bb5\u5feb\u901f\u4f30\u7b97\u548c\u6559\u5b66\u79d1\u7814\u8f85\u52a9\uff0c\u4e0d\u4f5c\u4e3a\u6b63\u5f0f\u78b3\u6838\u7b97\u3001\u78b3\u5ba1\u8ba1\u6216\u6cd5\u5b9a\u8bc4\u4ef7\u4f9d\u636e\u3002",
   basicInfo: "\u57fa\u7840\u4fe1\u606f",
   buildingName: "\u5efa\u7b51\u540d\u79f0",
   buildingType: "\u5efa\u7b51\u7c7b\u578b",
@@ -85,6 +99,14 @@ const text = {
   annualOperationCarbon:
     "\u8fd0\u884c\u9636\u6bb5\u5e74\u78b3\u6392\u653e",
 };
+
+const scenarios = [
+  "\u8bfe\u7a0b\u4f5c\u4e1a",
+  "\u8bfe\u9898\u6c47\u62a5",
+  "\u5efa\u7b51\u65b9\u6848\u6bd4\u9009",
+  "\u4f4e\u78b3\u8bbe\u8ba1\u521d\u6b65\u8bc4\u4f30",
+  "\u8bba\u6587\u56fe\u8868\u8f85\u52a9\u751f\u6210",
+];
 
 const buildingTypes = [
   "\u4f4f\u5b85",
@@ -501,7 +523,47 @@ export default function Home() {
           <p className="mt-4 max-w-3xl text-base leading-7 text-slate-600 sm:text-lg">
             {text.subtitle}
           </p>
+          <p className="mt-4 max-w-4xl text-sm leading-7 text-slate-600 sm:text-base">
+            {text.toolIntro}
+          </p>
         </header>
+
+        <section className="grid gap-6 border-b border-slate-200 py-8 lg:grid-cols-[1fr_1fr]">
+          <div>
+            <h2 className="text-xl font-semibold text-slate-950">
+              {text.scenariosTitle}
+            </h2>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              {scenarios.map((scenario) => (
+                <div
+                  className="rounded border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700"
+                  key={scenario}
+                >
+                  {scenario}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded border border-slate-200 bg-white p-5">
+            <h2 className="text-xl font-semibold text-slate-950">
+              {text.serviceTitle}
+            </h2>
+            <p className="mt-3 text-sm leading-7 text-slate-600">
+              {text.serviceDescription}
+            </p>
+            <div className="mt-4 grid gap-2 text-sm text-slate-600">
+              <p>
+                <span className="font-medium text-slate-800">{text.wechat}：</span>
+                {text.wechatPlaceholder}
+              </p>
+              <p>
+                <span className="font-medium text-slate-800">{text.email}：</span>
+                {text.emailPlaceholder}
+              </p>
+            </div>
+          </div>
+        </section>
 
         <section className="grid gap-8 py-8 lg:grid-cols-[minmax(0,1fr)_minmax(360px,0.9fr)]">
           <div className="rounded border border-slate-200 bg-white p-6 shadow-sm">
@@ -845,9 +907,13 @@ export default function Home() {
           </aside>
         </section>
 
-        <p className="border-t border-slate-200 pt-5 text-sm leading-6 text-slate-500">
-          {text.footerNote}
-        </p>
+        <footer className="grid gap-4 border-t border-slate-200 pt-5 text-sm leading-6 text-slate-500">
+          <p>{text.footerNote}</p>
+          <div className="rounded border border-slate-200 bg-white p-4">
+            <p className="font-semibold text-slate-800">{text.disclaimerTitle}</p>
+            <p className="mt-2">{text.disclaimer}</p>
+          </div>
+        </footer>
 
         <div
           aria-hidden="true"
