@@ -14,6 +14,12 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import {
+  defaultEmissionFactorSet,
+  factorUnits,
+  factorsToInputValues,
+  findRegionEmissionFactorSet,
+} from "../lib/regionEmissionFactors";
 
 const text = {
   eyebrow: "\u5efa\u7b51\u5168\u751f\u547d\u5468\u671f\u78b3\u6392\u653e\u6d4b\u7b97\u5de5\u5177",
@@ -23,7 +29,7 @@ const text = {
   inputTitle: "\u8f93\u5165\u533a",
   inputIntro:
     "\u586b\u5199\u5efa\u7b51\u65b9\u6848\u3001\u8fd0\u884c\u80fd\u8017\u3001\u5efa\u6750\u7528\u91cf\u548c\u78b3\u6392\u653e\u56e0\u5b50",
-  stage: "\u7b2c\u516b\u9636\u6bb5",
+  stage: "\u7b2c\u4e5d\u9636\u6bb5",
   toolIntro:
     "\u5efa\u7b51\u78b3\u6392\u653e\u5feb\u901f\u4f30\u7b97\u5668\u662f\u4e00\u6b3e\u9762\u5411\u5efa\u7b51\u65b9\u6848\u9636\u6bb5\u3001\u8bfe\u7a0b\u4f5c\u4e1a\u3001\u8bfe\u9898\u6c47\u62a5\u548c\u4f4e\u78b3\u8bbe\u8ba1\u521d\u6b65\u5206\u6790\u7684\u5728\u7ebf\u8ba1\u7b97\u5de5\u5177\u3002",
   scenariosTitle: "\u9002\u7528\u573a\u666f",
@@ -55,7 +61,24 @@ const text = {
   factorSettings: "\u78b3\u6392\u653e\u56e0\u5b50\u8bbe\u7f6e",
   electricityFactor: "\u7535\u529b",
   gasFactor: "\u5929\u7136\u6c14",
+  heatingFactor: "\u4f9b\u70ed",
+  coolingFactor: "\u5236\u51b7",
+  insulationFactor: "\u4fdd\u6e29\u6750\u6599",
+  blockFactor: "\u780c\u5757",
   resetFactors: "\u6062\u590d\u9ed8\u8ba4\u56e0\u5b50",
+  matchRegionFactors: "\u5339\u914d\u5730\u533a\u56e0\u5b50",
+  rematchRegionFactors: "\u91cd\u65b0\u5339\u914d\u5730\u533a\u56e0\u5b50",
+  factorGroup: "\u5f53\u524d\u56e0\u5b50\u7ec4",
+  factorStatus: "\u56e0\u5b50\u72b6\u6001",
+  factorSource: "\u56e0\u5b50\u6765\u6e90",
+  userCorrection: "\u7528\u6237\u4fee\u6b63",
+  notModified: "\u672a\u624b\u52a8\u4fee\u6b63",
+  modified: "\u5df2\u624b\u52a8\u4fee\u6b63\u90e8\u5206\u56e0\u5b50",
+  matchedPrefix: "\u5df2\u5339\u914d\uff1a",
+  unmatchedMessage:
+    "\u6682\u672a\u5339\u914d\u5230\u8be5\u5730\u533a\u4e13\u5c5e\u56e0\u5b50\uff0c\u5f53\u524d\u4f7f\u7528\u9ed8\u8ba4\u78b3\u6392\u653e\u56e0\u5b50\u3002",
+  factorLibraryNote:
+    "\u4e0d\u540c\u5730\u533a\u3001\u4e0d\u540c\u6807\u51c6\u3001\u4e0d\u540c\u80fd\u6e90\u7ed3\u6784\u548c\u6750\u6599\u751f\u4ea7\u5de5\u827a\u4e0b\uff0c\u78b3\u6392\u653e\u56e0\u5b50\u53ef\u80fd\u5b58\u5728\u5dee\u5f02\u3002\u672c\u5de5\u5177\u5f53\u524d\u63d0\u4f9b\u5730\u533a\u56e0\u5b50\u5339\u914d\u673a\u5236\uff0c\u5185\u7f6e\u6570\u503c\u4e3a\u793a\u4f8b\u6570\u636e\u5e93\uff0c\u6b63\u5f0f\u6838\u7b97\u65f6\u5e94\u4f9d\u636e\u6700\u65b0\u5b98\u65b9\u53d1\u5e03\u7684\u533a\u57df\u7535\u7f51\u6392\u653e\u56e0\u5b50\u3001\u5730\u65b9\u6807\u51c6\u3001\u9879\u76ee\u6307\u5b9a\u6570\u636e\u5e93\u6216\u6743\u5a01 LCA \u6570\u636e\u5e93\u8fdb\u884c\u66ff\u6362\u3002",
   calculate: "\u5f00\u59cb\u8ba1\u7b97",
   resultTitle: "\u7ed3\u679c\u9884\u89c8\u533a",
   resultIntro:
@@ -94,6 +117,7 @@ const text = {
   projectInfo: "\u4e00\u3001\u9879\u76ee\u57fa\u672c\u4fe1\u606f",
   inputData: "\u4e8c\u3001\u8f93\u5165\u6570\u636e",
   factorData: "\u4e09\u3001\u78b3\u6392\u653e\u56e0\u5b50",
+  factorGroupData: "\u4e09\u3001\u5730\u533a\u56e0\u5b50\u7ec4\u4fe1\u606f",
   resultData: "\u56db\u3001\u8ba1\u7b97\u7ed3\u679c",
   analysisData: "\u4e94\u3001\u81ea\u52a8\u5206\u6790\u7ed3\u8bba",
   annualOperationCarbon:
@@ -117,22 +141,28 @@ const buildingTypes = [
   "\u5176\u4ed6",
 ];
 
-const defaultFactorInputs = {
-  electricity: "0.55",
-  naturalGas: "2.16",
-  concrete: "300",
-  steel: "1800",
-  glass: "25",
-  aluminum: "9500",
-};
+const defaultFactorInputs = factorsToInputValues(defaultEmissionFactorSet.factors);
 
 const factorFields = [
-  { name: "electricity", label: text.electricityFactor, unit: "kgCO2/kWh" },
-  { name: "naturalGas", label: text.gasFactor, unit: "kgCO2/m\u00b3" },
-  { name: "concrete", label: text.concrete, unit: "kgCO2/m\u00b3" },
-  { name: "steel", label: text.steel, unit: "kgCO2/t" },
-  { name: "glass", label: text.glass, unit: "kgCO2/m\u00b2" },
-  { name: "aluminum", label: text.aluminum, unit: "kgCO2/t" },
+  { name: "electricity", label: text.electricityFactor, unit: factorUnits.electricity },
+  { name: "naturalGas", label: text.gasFactor, unit: factorUnits.naturalGas },
+  { name: "concrete", label: text.concrete, unit: factorUnits.concrete },
+  { name: "steel", label: text.steel, unit: factorUnits.steel },
+  { name: "glass", label: text.glass, unit: factorUnits.glass },
+  { name: "aluminum", label: text.aluminum, unit: factorUnits.aluminum },
+];
+
+const reportFactorFields = [
+  { name: "electricity", label: text.electricityFactor, unit: factorUnits.electricity },
+  { name: "naturalGas", label: text.gasFactor, unit: factorUnits.naturalGas },
+  { name: "heating", label: text.heatingFactor, unit: factorUnits.heating },
+  { name: "cooling", label: text.coolingFactor, unit: factorUnits.cooling },
+  { name: "concrete", label: text.concrete, unit: factorUnits.concrete },
+  { name: "steel", label: text.steel, unit: factorUnits.steel },
+  { name: "glass", label: text.glass, unit: factorUnits.glass },
+  { name: "aluminum", label: text.aluminum, unit: factorUnits.aluminum },
+  { name: "insulation", label: text.insulationFactor, unit: factorUnits.insulation },
+  { name: "block", label: text.blockFactor, unit: factorUnits.block },
 ];
 
 const initialForm = {
@@ -287,7 +317,14 @@ function ReportSection({ title, rows }) {
   );
 }
 
-function PdfReport({ analysis, factors, form, results }) {
+function PdfReport({
+  analysis,
+  factorSet,
+  factors,
+  form,
+  hasManualFactorEdit,
+  results,
+}) {
   if (!results) {
     return null;
   }
@@ -310,23 +347,20 @@ function PdfReport({ analysis, factors, form, results }) {
     { label: text.glass, value: displayNumber(form.glass, "m\u00b2") },
     { label: text.aluminum, value: displayNumber(form.aluminum, "t") },
   ];
-  const factorRows = [
+  const factorGroupRows = [
+    { label: text.region, value: displayText(form.region) },
+    { label: text.factorGroup, value: factorSet.displayName },
+    { label: text.factorStatus, value: factorSet.sourceType },
+    { label: text.factorSource, value: factorSet.sourceNote },
     {
-      label: text.electricityFactor,
-      value: displayFactor(factors.electricity, "kgCO2/kWh"),
+      label: text.userCorrection,
+      value: hasManualFactorEdit ? text.modified : text.notModified,
     },
-    {
-      label: text.gasFactor,
-      value: displayFactor(factors.naturalGas, "kgCO2/m\u00b3"),
-    },
-    {
-      label: text.concrete,
-      value: displayFactor(factors.concrete, "kgCO2/m\u00b3"),
-    },
-    { label: text.steel, value: displayFactor(factors.steel, "kgCO2/t") },
-    { label: text.glass, value: displayFactor(factors.glass, "kgCO2/m\u00b2") },
-    { label: text.aluminum, value: displayFactor(factors.aluminum, "kgCO2/t") },
   ];
+  const factorRows = reportFactorFields.map((field) => ({
+    label: field.label,
+    value: displayFactor(factors[field.name], field.unit),
+  }));
   const resultRows = [
     { label: text.materialCarbon, value: formatTon(results.materialCarbon) },
     {
@@ -349,6 +383,7 @@ function PdfReport({ analysis, factors, form, results }) {
 
       <ReportSection rows={projectRows} title={text.projectInfo} />
       <ReportSection rows={inputRows} title={text.inputData} />
+      <ReportSection rows={factorGroupRows} title={text.factorGroupData} />
       <ReportSection rows={factorRows} title={text.factorData} />
       <ReportSection rows={resultRows} title={text.resultData} />
 
@@ -365,6 +400,9 @@ function PdfReport({ analysis, factors, form, results }) {
 export default function Home() {
   const [form, setForm] = useState(initialForm);
   const [factorInputs, setFactorInputs] = useState(defaultFactorInputs);
+  const [currentFactorSet, setCurrentFactorSet] = useState(defaultEmissionFactorSet);
+  const [hasManualFactorEdit, setHasManualFactorEdit] = useState(false);
+  const [factorMatchMessage, setFactorMatchMessage] = useState("");
   const [results, setResults] = useState(null);
   const [isExporting, setIsExporting] = useState(false);
   const reportRef = useRef(null);
@@ -381,10 +419,35 @@ export default function Home() {
       ...current,
       [name]: value,
     }));
+    setHasManualFactorEdit(true);
   }
 
   function resetFactors() {
     setFactorInputs(defaultFactorInputs);
+    setCurrentFactorSet(defaultEmissionFactorSet);
+    setHasManualFactorEdit(false);
+    setFactorMatchMessage("");
+  }
+
+  function applyFactorSet(factorSet) {
+    setFactorInputs(factorsToInputValues(factorSet.factors));
+    setCurrentFactorSet(factorSet);
+    setHasManualFactorEdit(false);
+    setFactorMatchMessage(`${text.matchedPrefix}${factorSet.displayName}`);
+  }
+
+  function matchRegionFactors() {
+    const matchedFactorSet = findRegionEmissionFactorSet(form.region);
+
+    if (matchedFactorSet) {
+      applyFactorSet(matchedFactorSet);
+      return;
+    }
+
+    setFactorInputs(defaultFactorInputs);
+    setCurrentFactorSet(defaultEmissionFactorSet);
+    setHasManualFactorEdit(false);
+    setFactorMatchMessage(text.unmatchedMessage);
   }
 
   function handleCalculate(event) {
@@ -609,13 +672,24 @@ export default function Home() {
                 </Field>
 
                 <Field label={text.region}>
-                  <input
-                    className={inputClass}
-                    onChange={(event) => updateField("region", event.target.value)}
-                    placeholder={text.placeholderRegion}
-                    type="text"
-                    value={form.region}
-                  />
+                  <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto]">
+                    <input
+                      className={inputClass}
+                      onChange={(event) =>
+                        updateField("region", event.target.value)
+                      }
+                      placeholder={text.placeholderRegion}
+                      type="text"
+                      value={form.region}
+                    />
+                    <button
+                      className="h-11 rounded border border-emerald-700 bg-white px-4 text-sm font-semibold text-emerald-800 transition hover:bg-emerald-50"
+                      onClick={matchRegionFactors}
+                      type="button"
+                    >
+                      {text.matchRegionFactors}
+                    </button>
+                  </div>
                 </Field>
 
                 <div className="grid gap-5 sm:grid-cols-2">
@@ -739,6 +813,37 @@ export default function Home() {
                 <summary className="cursor-pointer text-base font-semibold text-slate-900">
                   {text.factorSettings}
                 </summary>
+                <div className="mt-4 rounded border border-slate-200 bg-white p-4 text-sm leading-6 text-slate-600">
+                  <p>
+                    <span className="font-medium text-slate-800">
+                      {text.factorGroup}：
+                    </span>
+                    {currentFactorSet.displayName}
+                  </p>
+                  <p>
+                    <span className="font-medium text-slate-800">
+                      {text.factorStatus}：
+                    </span>
+                    {currentFactorSet.sourceType}
+                  </p>
+                  <p>
+                    <span className="font-medium text-slate-800">
+                      {text.factorSource}：
+                    </span>
+                    {currentFactorSet.sourceNote}
+                  </p>
+                  <p>
+                    <span className="font-medium text-slate-800">
+                      {text.userCorrection}：
+                    </span>
+                    {hasManualFactorEdit ? text.modified : text.notModified}
+                  </p>
+                  {factorMatchMessage ? (
+                    <p className="mt-2 font-medium text-emerald-700">
+                      {factorMatchMessage}
+                    </p>
+                  ) : null}
+                </div>
                 <div className="mt-5 grid gap-5 sm:grid-cols-2">
                   {factorFields.map((field) => (
                     <Field
@@ -766,6 +871,16 @@ export default function Home() {
                 >
                   {text.resetFactors}
                 </button>
+                <button
+                  className="ml-0 mt-3 h-10 rounded border border-slate-300 bg-white px-4 text-sm font-medium text-slate-700 transition hover:bg-slate-100 sm:ml-3"
+                  onClick={matchRegionFactors}
+                  type="button"
+                >
+                  {text.rematchRegionFactors}
+                </button>
+                <p className="mt-4 text-sm leading-6 text-slate-500">
+                  {text.factorLibraryNote}
+                </p>
               </details>
 
               <button
@@ -926,8 +1041,10 @@ export default function Home() {
         >
           <PdfReport
             analysis={analysis}
+            factorSet={currentFactorSet}
             factors={factorInputs}
             form={form}
+            hasManualFactorEdit={hasManualFactorEdit}
             results={results}
           />
         </div>
