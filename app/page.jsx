@@ -131,13 +131,6 @@ const text = {
     "\u8fd0\u884c\u9636\u6bb5\u5e74\u78b3\u6392\u653e",
 };
 
-const featureTags = [
-  "\u5730\u533a\u56e0\u5b50\u5339\u914d",
-  "\u7701\u5e02\u6eda\u8f6e\u9009\u62e9",
-  "\u7ed3\u679c\u53ef\u89c6\u5316",
-  "PDF \u62a5\u544a\u5bfc\u51fa",
-];
-
 const scenarios = [
   "\u8bfe\u7a0b\u4f5c\u4e1a",
   "\u8bfe\u9898\u6c47\u62a5",
@@ -726,16 +719,6 @@ export default function Home() {
           <p className="mt-4 max-w-4xl text-sm leading-7 text-slate-600 sm:text-base">
             {text.toolIntro}
           </p>
-          <div className="mt-5 flex flex-wrap gap-2">
-            {featureTags.map((tag) => (
-              <span
-                className="rounded-full border border-teal-100 bg-teal-50 px-3 py-1 text-sm font-medium text-teal-800"
-                key={tag}
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
         </header>
 
         <section className="grid gap-8 py-8 lg:grid-cols-[minmax(0,1.08fr)_minmax(380px,0.92fr)]">
